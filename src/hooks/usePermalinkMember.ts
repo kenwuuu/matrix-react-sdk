@@ -105,16 +105,27 @@ export const usePermalinkMember = (
     targetRoom: Room | null,
     event: MatrixEvent | null,
 ): RoomMember | null => {
-    // User mentions and permalinks to events in the same room require to know the user.
-    // If it cannot be initially determined, it will be looked up later by a memo hook.
     const shouldLookUpUser = type && [PillType.UserMention, PillType.EventInSameRoom].includes(type);
-    const userId = determineUserId(type, parseResult, event);
+    console.log("shouldLookUpUser:", shouldLookUpUser);
+    const userId = determineUserId(type, parseResult, event); // correct
+    console.log("userId line 111:", userId);
     const userInRoom = shouldLookUpUser && userId && targetRoom ? determineMember(userId, targetRoom) : null;
-    const [member, setMember] = useState<RoomMember | null>(userInRoom);
+    console.log("userInRoom:", userInRoom); // correct
 
+    // TODO comment/uncomment the following lines to test broken/working code
+    // const [member, setMember] = useState<RoomMember | null>(null);  // broken
+    let member: RoomMember | null = userInRoom; // working
+
+    console.log("member line 115:", member); // incorrect
     useEffect(() => {
+        console.log("usePermalinkMember: useEffect called");
+        console.log("member:", member);
+        console.log("shouldLookUpUser:", shouldLookUpUser);
+        console.log("targetRoom:", targetRoom);
+        console.log("userId:", userId);
+
         if (!shouldLookUpUser || !userId || member) {
-            // nothing to do here
+            console.log("usePermalinkMember: return");
             return;
         }
 
@@ -122,13 +133,24 @@ export const usePermalinkMember = (
             const fetchedProfile = await SdkContextClass.instance.userProfilesStore.fetchOnlyKnownProfile(userId);
 
             if (fetchedProfile) {
-                const newMember = createMemberFromProfile(userId, fetchedProfile);
-                setMember(newMember);
+                // TODO comment/uncomment the following lines to test broken/working code
+
+                // broken
+                // console.log("usePermalinkMember: fetchedProfile:", fetchedProfile);
+                // const newMember = createMemberFromProfile(userId, fetchedProfile);
+                // console.log("usePermalinkMember: newMember:", newMember);
+                // setMember(newMember);
+
+                // working
+                console.log("usePermalinkMember: fetchedProfile:", fetchedProfile);
+                member = createMemberFromProfile(userId, fetchedProfile);
+                console.log("usePermalinkMember: member:", member);
             }
         };
 
         doProfileLookup();
     }, [member, shouldLookUpUser, targetRoom, userId]);
 
+    console.log("usePermalinkMember: return member:", member); // incorrect
     return member;
 };

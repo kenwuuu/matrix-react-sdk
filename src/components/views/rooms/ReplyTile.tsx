@@ -149,9 +149,6 @@ export default class ReplyTile extends React.PureComponent<IProps> {
         if (!hasOwnSender) {
             sender = (
                 <div className="mx_ReplyTile_sender">
-                    {/*<MemberAvatar member={mxEvent.sender} fallbackUserId={mxEvent.getSender()} width={16} height={16} />*/}
-                    {/*<SenderProfile mxEvent={mxEvent} />*/}
-                {/*    todo gotcha bitch, replace this sender profile with the */}
                     <Pill
                         type={PillType.UserMention}
                         room={room ?? undefined}

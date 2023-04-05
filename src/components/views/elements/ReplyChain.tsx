@@ -215,6 +215,10 @@ export default class ReplyChain extends React.Component<IProps, IState> {
         } else if (this.state.loadedEv && shouldDisplayReply(this.state.events[0])) {
             const ev = this.state.loadedEv;
             const room = this.matrixClient.getRoom(ev.getRoomId());
+            // console.log("data-event-id: ", ev.getId())
+            // console.log("ReplyChain.render: ev=", ev, "room=", room)
+            // console.log("ReplyChain.render: ev.getSender()=", ev.getSender())
+            // console.log("makeUserPermalink(ev.getSender()!): ", makeUserPermalink(ev.getSender()!))
             header = (
                 <blockquote className={`mx_ReplyChain ${this.getReplyChainColorClass(ev)}`}>
                     {_t(

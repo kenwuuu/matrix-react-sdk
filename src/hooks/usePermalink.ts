@@ -140,18 +140,22 @@ export const usePermalink: (args: Args) => HookResult = ({
         }
     }
 
+    console.log("parseResult", parseResult);  // userid is correct
     const type = determineType(forcedType, parseResult, permalinkRoom);
     const targetRoom = usePermalinkTargetRoom(type, parseResult, permalinkRoom);
     const event = usePermalinkEvent(type, parseResult, targetRoom);
     const member = usePermalinkMember(type, parseResult, targetRoom, event);
+    console.log("member name", member.name);  // wrong
+    console.log("resourceID", resourceId);  // correct
 
     let onClick: (e: ButtonEvent) => void = () => {};
     let text = resourceId;
 
+    // if current room is mentioned, use current room name
     if (type === PillType.AtRoomMention && permalinkRoom) {
         text = "@room";
-    } else if (type === PillType.UserMention && member) {
-        text = member.name || resourceId;
+    } else if (type === PillType.UserMention && member) { // if user is mentioned, use their name
+        text = member.name || resourceId;  // i think this is the line that is causing the issue
         onClick = (e: ButtonEvent): void => {
             e.preventDefault();
             e.stopPropagation();
@@ -160,7 +164,7 @@ export const usePermalink: (args: Args) => HookResult = ({
                 member: member,
             });
         };
-    } else if (type === PillType.RoomMention) {
+    } else if (type === PillType.RoomMention) { // if room that isn't current room is mentioned, use its name
         if (targetRoom) {
             text = targetRoom.name || resourceId;
         }
@@ -169,7 +173,8 @@ export const usePermalink: (args: Args) => HookResult = ({
     } else if (type === PillType.EventInOtherRoom) {
         text = targetRoom?.name || _t("Room");
     }
-
+    // console.log("event: ", event, "member: ", member, "onClick: ", onClick, "resourceId: ",
+    //     resourceId, "targetRoom: ", targetRoom, "text: ", text, "type: ", type);
     return {
         event,
         member,
