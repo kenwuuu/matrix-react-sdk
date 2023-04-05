@@ -88,6 +88,7 @@ export interface PillProps {
     shouldShowPillAvatar?: boolean;
 }
 
+// todo ok we just gotta use this in .... just like we do in ReplyChain.tsx
 export const Pill: React.FC<PillProps> = ({ type: propType, url, inMessage, room, shouldShowPillAvatar = true }) => {
     const [hover, setHover] = useState(false);
     const { event, member, onClick, resourceId, targetRoom, text, type } = usePermalink({
@@ -105,7 +106,7 @@ export const Pill: React.FC<PillProps> = ({ type: propType, url, inMessage, room
         mx_RoomPill: type === PillType.RoomMention,
         mx_SpacePill: type === "space",
         mx_UserPill: type === PillType.UserMention,
-        mx_UserPill_me: resourceId === MatrixClientPeg.get().getUserId(),
+        mx_UserPill_me: resourceId === MatrixClientPeg.get().getUserId(),  // this has the correct css for pilling. we just need to transfer this over
         mx_EventPill: type === PillType.EventInOtherRoom || type === PillType.EventInSameRoom,
     });
 

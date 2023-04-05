@@ -224,7 +224,7 @@ export default class ReplyChain extends React.Component<IProps, IState> {
                             a: (sub) => (
                                 <AccessibleButton
                                     kind="link_inline"
-                                    className="mx_ReplyChain_show"
+                                    className="mx_ReplyChain_show"  // whatever uses this (the parent that has "mx_ReplyChain mx_ReplyChain_color4") is the one that owns the user pill, we need to find it
                                     onClick={this.onQuoteClick}
                                 >
                                     {sub}
