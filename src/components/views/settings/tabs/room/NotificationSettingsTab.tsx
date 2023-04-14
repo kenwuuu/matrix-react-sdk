@@ -170,9 +170,9 @@ export default class NotificationsSettingsTab extends React.Component<IProps, IS
                     />
                 </div>
 
-                <NotificationSound currentSound={this.state.currentSound}
-                                   level={this.state.notificationSettingLevel}
-                                   // onFileUpload={this.onFileUpload}
+                <NotificationSound
+                    currentSound={this.state.currentSound}
+                    level={this.state.notificationSettingLevel}
                 />
             </div>
         );

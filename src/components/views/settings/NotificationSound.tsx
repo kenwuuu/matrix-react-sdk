@@ -29,6 +29,7 @@ interface IProps {
     roomId?: string | null,
     currentSound: string,
     level: SettingLevel,
+    largerFontSize?: boolean | null,
 }
 
 interface IState {
@@ -180,7 +181,7 @@ class NotificationSound extends React.Component<IProps, IState> {
                 </AccessibleButton>
             </div>
             <div>
-                <h3>{_t("Set a new custom sound")}</h3>
+                <span>{_t("Set a new custom sound")}</span>
                 <div className="mx_SettingsFlag">
                     <form autoComplete="off" noValidate={true}>
                         <input

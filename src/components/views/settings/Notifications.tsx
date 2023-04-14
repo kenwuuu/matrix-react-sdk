@@ -70,7 +70,6 @@ enum RuleClass {
     // The vector sections map approximately to UI sections
     VectorGlobal = "vector_global",
     VectorMentions = "vector_mentions",
-    // VectorSound = "vector_sound",
     VectorOther = "vector_other",
     Other = "other", // unknown rules, essentially
 }
@@ -216,7 +215,7 @@ export default class Notifications extends React.PureComponent<IProps, IState> {
             desktopShowBody: SettingsStore.getValue("notificationBodyEnabled"),
             audioNotifications: SettingsStore.getValue("audioNotificationsEnabled"),
             clearingNotifications: false,
-            ruleIdsWithError: {}
+            ruleIdsWithError: {},
         };
 
         this.settingWatchers = [
@@ -355,11 +354,7 @@ export default class Notifications extends React.PureComponent<IProps, IState> {
 
         // Prepare rendering for all of our known rules
         preparedNewState.vectorPushRules = {};
-        const vectorCategories = [RuleClass.VectorGlobal,
-            RuleClass.VectorMentions,
-            // RuleClass.VectorSound,
-            RuleClass.VectorOther];
-
+        const vectorCategories = [RuleClass.VectorGlobal, RuleClass.VectorMentions, RuleClass.VectorOther];
         for (const category of vectorCategories) {
             preparedNewState.vectorPushRules[category] = [];
             for (const rule of defaultRules[category]) {
@@ -886,6 +881,22 @@ export default class Notifications extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /*
+    render section for sounds
+
+    @returns {ReactNode} the rendered section, or null if the section should be hidden
+     */
+    private renderSounds(): ReactNode {
+        return (
+            <div className="mx_UserNotifSettings_floatingSection">
+                <NotificationSound
+                    currentSound={this.state.currentSound}
+                    level={this.state.notificationSettingLevel}
+                />
+            </div>
+        );
+    }
+
     public render(): React.ReactNode {
         if (this.state.phase === Phase.Loading) {
             // Ends up default centered
@@ -900,7 +911,7 @@ export default class Notifications extends React.PureComponent<IProps, IState> {
                 {this.renderCategory(RuleClass.VectorGlobal)}
                 {this.renderCategory(RuleClass.VectorMentions)}
                 {this.renderCategory(RuleClass.VectorOther)}
-                <NotificationSound currentSound={this.state.currentSound} level={this.state.notificationSettingLevel} />
+                {this.renderSounds()}
                 {this.renderTargets()}
             </div>
         );
