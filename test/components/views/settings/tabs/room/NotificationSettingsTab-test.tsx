@@ -27,7 +27,7 @@ import { RoomEchoChamber } from "../../../../../../src/stores/local-echo/RoomEch
 import SettingsStore from "../../../../../../src/settings/SettingsStore";
 import { SettingLevel } from "../../../../../../src/settings/SettingLevel";
 
-describe("NotificatinSettingsTab", () => {
+describe("NotificationSettingsTab", () => {
     const roomId = "!room:example.com";
     let cli: MatrixClient;
     let roomProps: RoomEchoChamber;

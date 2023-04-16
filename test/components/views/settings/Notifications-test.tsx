@@ -14,26 +14,41 @@ limitations under the License.
 
 import React from "react";
 import {
-    IPushRule,
-    IPushRules,
-    RuleId,
+    ConditionKind,
     IPusher,
+    IPushRule,
+    IPushRuleCondition,
+    IPushRules,
     LOCAL_NOTIFICATION_SETTINGS_PREFIX,
+    MatrixClient,
     MatrixEvent,
-    Room,
     NotificationCountType,
     PushRuleActionName,
+    Room,
+    RuleId,
     TweakName,
-    ConditionKind,
-    IPushRuleCondition,
 } from "matrix-js-sdk/src/matrix";
-import { IThreepid, ThreepidMedium } from "matrix-js-sdk/src/@types/threepids";
-import { act, fireEvent, getByTestId, render, screen, waitFor, within } from "@testing-library/react";
+import {IThreepid, ThreepidMedium} from "matrix-js-sdk/src/@types/threepids";
+import {act, fireEvent, getByTestId, render, RenderResult, screen, waitFor, within} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import Notifications from "../../../../src/components/views/settings/Notifications";
 import SettingsStore from "../../../../src/settings/SettingsStore";
-import { StandardActions } from "../../../../src/notifications/StandardActions";
-import { getMockClientWithEventEmitter, mkMessage, mockClientMethodsUser } from "../../../test-utils";
+import {StandardActions} from "../../../../src/notifications/StandardActions";
+import {
+    getMockClientWithEventEmitter,
+    mkMessage,
+    mkStubRoom,
+    mockClientMethodsUser,
+    stubClient
+} from "../../../test-utils";
+import {RoomEchoChamber} from "../../../../src/stores/local-echo/RoomEchoChamber";
+import NotificationSettingsTab from "../../../../src/components/views/settings/tabs/room/NotificationSettingsTab";
+import {MatrixClientPeg} from "../../../../src/MatrixClientPeg";
+import {EchoChamber} from "../../../../src/stores/local-echo/EchoChamber";
+import {SettingLevel} from "../../../../src/settings/SettingLevel";
+import NotificationSound from "../../../../src/components/views/settings/NotificationSound";
+import {Notifier} from "../../../../src/Notifier";
 
 // don't pollute test output with error logs from mock rejections
 jest.mock("matrix-js-sdk/src/logger");
@@ -796,6 +811,66 @@ describe("<Notifications />", () => {
                     "An error occurred when updating your notification preferences. Please try to toggle your option again.",
                 ),
             ).toBeInTheDocument();
+        });
+    });
+
+    describe("NotificationSound", () => {
+        const roomId = "!room:example.com";
+        let cli: MatrixClient;
+        let roomProps: RoomEchoChamber;
+
+        let currentSound = "default";
+        const soundData = Notifier.getNotificationSound("account");
+        if (soundData) {
+            currentSound = soundData.name || soundData.url;
+        }
+
+        const renderTab = (): RenderResult => {
+            return render(<NotificationSound roomId={roomId}
+                                             currentSound={currentSound}
+                                             level={SettingLevel.ACCOUNT} />);
+        };
+
+        beforeEach(() => {
+            stubClient();
+            cli = MatrixClientPeg.get();
+            const room = mkStubRoom(roomId, "test room", cli);
+            roomProps = EchoChamber.forRoom(room);
+
+            NotificationSettingsTab.contextType = React.createContext<MatrixClient>(cli);
+        });
+
+        it("should prevent »Settings« link click from bubbling up to radio buttons", async () => {
+            const tab = renderTab();
+
+            // settings link of mentions_only volume
+            const settingsLink = tab.container.querySelector(
+                "label.mx_NotificationSettingsTab_mentionsKeywordsEntry div.mx_AccessibleButton",
+            );
+            if (!settingsLink) throw new Error("settings link does not exist.");
+
+            await userEvent.click(settingsLink);
+
+            expect(roomProps.notificationVolume).not.toBe("mentions_only");
+        });
+
+        it("should show the currently chosen custom notification sound", async () => {
+            SettingsStore.setValue("notificationSound", roomId, SettingLevel.ACCOUNT, {
+                url: "mxc://server/custom-sound-123",
+                name: "custom-sound-123",
+            });
+            renderTab();
+
+            await screen.findByText("custom-sound-123");
+        });
+
+        it("should show the currently chosen custom notification sound url if no name", async () => {
+            SettingsStore.setValue("notificationSound", roomId, SettingLevel.ACCOUNT, {
+                url: "mxc://server/custom-sound-123",
+            });
+            renderTab();
+
+            await screen.findByText("http://this.is.a.url/server/custom-sound-123");
         });
     });
 
