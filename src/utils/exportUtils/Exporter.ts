@@ -21,6 +21,7 @@ import { Direction } from "matrix-js-sdk/src/models/event-timeline";
 import { saveAs } from "file-saver";
 import { logger } from "matrix-js-sdk/src/logger";
 import sanitizeFilename from "sanitize-filename";
+import { MsgType } from "matrix-js-sdk/src/@types/event";
 
 import { MatrixClientPeg } from "../../MatrixClientPeg";
 import { ExportType, IExportOptions } from "./exportUtils";
@@ -268,13 +269,13 @@ export default abstract class Exporter {
         const mediaType = event.getContent().msgtype;
         let fileDirectory: string;
         switch (mediaType) {
-            case "m.image":
+            case MsgType.Image:
                 fileDirectory = "images";
                 break;
-            case "m.video":
+            case MsgType.Video:
                 fileDirectory = "videos";
                 break;
-            case "m.audio":
+            case MsgType.Audio:
                 fileDirectory = "audio";
                 break;
             default:
@@ -298,7 +299,7 @@ export default abstract class Exporter {
     }
 
     protected isAttachment(mxEv: MatrixEvent): boolean {
-        const attachmentTypes = ["m.sticker", "m.image", "m.file", "m.video", "m.audio"];
+        const attachmentTypes = ["m.sticker", MsgType.Image, MsgType.File, MsgType.Video, MsgType.Audio];
         return mxEv.getType() === attachmentTypes[0] || attachmentTypes.includes(mxEv.getContent().msgtype!);
     }
 
